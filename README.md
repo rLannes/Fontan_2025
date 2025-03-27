@@ -26,7 +26,7 @@ run the jupyter notebook:
 you need to tun splicing_efficiency module
 with spliced-def 9
 and unspliced-def 10 11 12 13
-
+then run SplicingEfficiencyPlotSI.ipynb
 
 #### 3 - backsplicing
 run the backsplicing module of omnisplice on the Currated Y gene annotation and the Dryad genome. 
