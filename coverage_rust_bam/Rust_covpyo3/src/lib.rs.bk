@@ -1,0 +1,134 @@
+use pyo3::prelude::*;
+use pyo3::wrap_pyfunction;
+use rust_htslib::bam::{IndexedReader, Read, Header};
+use rust_htslib::bam;
+use std::collections::HashMap;
+use strand_specifier_lib::{Strand, LibType, check_flag};
+
+/*fn check_flag(flag: u16, in_: u16, not_in: u16)->bool{
+    //binary flag check
+    //assert that: - in_ is in n
+    //             - not_in is not in n
+    // bitwise operation
+    if (not_in & flag) != 0{
+        return false}
+    if (in_ & flag) != in_{
+        return false}
+    return true
+}
+*/
+
+#[pyfunction]
+fn get_header(bam_path: String) -> PyResult<Vec<String>>{
+
+    let bam = bam::Reader::from_path(&bam_path).unwrap();
+    let header = bam::Header::from_template(bam.header());
+    let mut seq: Vec<String> = Vec::new(); 
+
+    for (key, records) in header.to_hashmap() {
+            for record in records {
+                if record.contains_key("SN"){
+                    seq.push(record["SN"].to_string());
+                }
+            }
+    }
+    Ok(seq)
+}
+
+#[pyfunction]
+fn get_coverage(start:i64, end:i64, chrom: String, strand: String,
+     bam_path: String, lib: String, mapq_thr: u8) -> PyResult<Vec<u32>>{
+    ///
+    /// retrieve the Primary aligned reads at between start and end in a given bam
+    /// at the moment only rf stranded librairy are supported.
+    /// I will update fr ans non starnde dif I need it or people ask for it.
+    /// 
+    //let mut map: HashMap<i64, u32> = HashMap::with_capacity((end - start) as usize);
+    let mut container = vec![0; (end - start) as usize];
+    let mut bam = IndexedReader::from_path(&bam_path).unwrap();
+    //let mut pos = 0;
+    //println!("");
+    //bam.fetch((&chrom, start, end)); // fetch does not work
+    bam.fetch((&chrom, start, end)).unwrap();
+    let mut cpt = 0;
+    for p in bam.pileup() {
+        let pileup = p.unwrap();
+        cpt = 0;
+        if start <= i64::from(pileup.pos()) && i64::from(pileup.pos()) < end {
+            for alignment in pileup.alignments() {
+                if !alignment.is_del() && !alignment.is_refskip() && !check_flag(alignment.record().flags(), 256, 0) && !(alignment.record().mapq() < mapq_thr){
+                    
+                    match lib.trim() {
+                        "rf" => {
+                                if strand == "+" && (check_flag(alignment.record().flags(), 128, 16) || check_flag(alignment.record().flags(), 64, 32)){
+                                cpt += 1;
+                                continue}
+                                if strand == "-" && (check_flag(alignment.record().flags(), 144, 0) || check_flag(alignment.record().flags(), 96, 0)){
+                                cpt += 1;
+                                continue}
+                            }
+                        "fr" => {
+                            if strand == "-" && (check_flag(alignment.record().flags(), 128, 16) || check_flag(alignment.record().flags(), 64, 32)){
+                            cpt += 1;
+                            continue}
+                            if strand == "+" && (check_flag(alignment.record().flags(), 144, 0) || check_flag(alignment.record().flags(), 96, 0)){
+                            cpt += 1;
+                            continue}
+                        }
+                        "se" => {
+                            cpt += 1;
+                            continue
+                        }
+                        "uns" => {
+                            cpt += 1;
+                            continue
+                        }
+                        _ => panic!("unknow lib scheme")
+
+
+                    }
+                    // if strand == "+" && (check_flag(alignment.record().flags(), 128, 16) || check_flag(alignment.record().flags(), 64, 32)){
+                    //     cpt += 1;
+                    //     continue}
+                    // if strand == "-" && (check_flag(alignment.record().flags(), 144, 0) || check_flag(alignment.record().flags(), 96, 0)){
+                    //     cpt += 1;
+                    //     continue}
+                    
+                }
+            }
+            //println!("{}  pileup.pos(), start : {}",  pileup.pos() as i64, start as i64);
+            container[(pileup.pos() as i64 - start as i64) as usize ] = cpt;
+            // pos += 1;
+            // if pos % 1_000_000 == 0:
+            // println!("{} psotion done");
+            //map.insert(pileup.pos().into(), cpt);
+        }
+        // else{
+        // println!("{}  pileup.pos(), start : {}",  pileup.pos() as i64, start as i64);
+        // }
+    } 
+
+    // let mut results: Vec<u32> = Vec::with_capacity((end - start) as usize);
+    // for indice in start..end{
+    //     match map.get(&indice){
+    //         Some(x) => {results.push(*x)}
+    //         _ => {results.push(0)}
+    //     }
+    // }
+    return Ok(container)
+
+}
+
+// /// Formats the sum of two numbers as string.
+// #[pyfunction]
+// fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+//     Ok((a + b).to_string())
+// }
+
+/// A Python module implemented in Rust.
+#[pymodule]
+fn Rust_covpyo3(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(get_coverage, m)?)?;
+    m.add_function(wrap_pyfunction!(get_header, m)?)?;
+    Ok(())
+}
