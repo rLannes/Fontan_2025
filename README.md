@@ -16,8 +16,10 @@ you need to install it first, please refer to the readme file inside the directo
 Once you have it installed, run the coverage notebook "CoverPlotSI.ipynb". you will need the aligned bam.
 
 
-## 2 - OmniSplice Plot
-you will need to run omnisplice with default parameter and  "--read-to-write soft-clipped" option
+## 2 - OmniSplice Plot
+you will need to run omnisplice (https://github.com/rLannes/OmniSplice; https://www.biorxiv.org/content/10.1101/2025.04.06.647416v1) with default parameter and  "--read-to-write soft-clipped" option
+You will need to run omnisplice with D.mauritiana Y genes annotated AND the refeseq simulans (for the X and autosomes).
+
 #### 1 - To reproduce the plot of the different splicing defect:
 run the jupyter notebook:
   "OmniSplice_table_plotSI.ipynb"
