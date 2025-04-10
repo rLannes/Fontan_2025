@@ -17,7 +17,8 @@ Once you have it installed, run the coverage notebook "CoverPlotSI.ipynb". you w
 
 
 ## 2 - OmniSplice Plot
-you will need to run omnisplice (https://github.com/rLannes/OmniSplice; https://www.biorxiv.org/content/10.1101/2025.04.06.647416v1) with default parameter and  "--read-to-write soft-clipped" option
+you will need to run omnisplice (https://github.com/rLannes/OmniSplice; https://www.biorxiv.org/content/10.1101/2025.04.06.647416v1) with default parameter and  "--read-to-write soft-clipped  --spliced-def 9
+--unspliced-def 10 11 12 13" option
 You will need to run omnisplice with D.mauritiana Y genes annotated AND the refeseq simulans (for the X and autosomes).
 
 #### 1 - To reproduce the plot of the different splicing defect:
@@ -25,25 +26,40 @@ run the jupyter notebook:
   "OmniSplice_table_plotSI.ipynb"
 
 #### 2 - To make the plot that show splicig defect with intron length run:
-you need to tun splicing_efficiency module
-with spliced-def 9
-and unspliced-def 10 11 12 13
-then run SplicingEfficiencyPlotSI.ipynb
+run SplicingEfficiencyPlotSI.ipynb
 
 #### 3 - backsplicing
 run the backsplicing module of omnisplice on the Currated Y gene annotation and the Dryad genome. 
-
-## 3 - TE
-
-
-## 4 - DE
+To do so you will need bowtie2 and the bowtie2 reference of the genome you ran omnisplice.
+In this study we ran it on the Y linked genes in the Ching-Ho assembly.
 
 
-## 5 - Dot Plot
+## 3 - DE
+
+
+## 4 - Dot Plot
 To make the dot plot we implemented a custom programs.
+you'll need rust installed with maturin ( pip install maturin pip install numpy)
 
-## 6 - exon coverage 
+Please follow those preparatory step:
+
+1- Compile aligner:
+cd GlobalAlignerDNA
+cargo build --release
+
+2- compile and build python wheel.
+cd ../pairAlnWindow_dotplot
+maturin build --release 
+
+3- add maturin wheel to your python (optionaly you cna use virtual env)
+python -m pip install -U ./target/wheels/*.wheel
+
+4- finally run the dot plot notebook
+dotPlotPlot.ipynb
+
+## 5 - exon coverage 
 To reproduce the exon coverage plot.
+
 
 ### Align the read and sort and index the bam file:
 
