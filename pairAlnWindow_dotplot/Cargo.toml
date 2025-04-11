@@ -1,0 +1,16 @@
+[package]
+name = "pairAlnWindow_dotplot"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "Rust_alnPairMat"
+crate-type = ["cdylib"]
+
+[features]
+default = ["pyo3/extension-module"]
+
+[dependencies]
+pyo3 = "0.19.0"
+rayon = "1.10"
+GlobalAlignerDNA = { path = "../GlobalAlignerDNA" }
