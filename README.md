@@ -67,7 +67,6 @@ first you need to align the read as described in the manuscript, to both D. maur
 sort an index the bam files
 
 
-
 ### gtf formatting
 
 Then you need to merge the gtf file with our manually currated annotation.
@@ -121,9 +120,6 @@ bedtools coverage -sorted -g genome_file_dmau_dryad.txt -a dmau_exon.bamsorted.b
 the coverage file "coverage_dmauExon_dmau_SRR22548176" contains all the informatio we need
 
 you can now run the plot part of the notebook.
-
-
-
 
 
 
