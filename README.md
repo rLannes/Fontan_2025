@@ -2,6 +2,13 @@
 Code to reproduce Fontan 2025
 
 To reproduce most analyses you will need a directory with the sorted and indexed bam files.
+because of the compexity of working with multiple reference
+
+we recommand that you put your bam file into separate directory based on the reference used
+Moreover we followed this convention:
+  trimmed_genotype_sample_lane_VSreference.bam
+  with genotype (sim / sim_mau/ mau)
+  
 If you face any difficulty please open an issue on this github repo.
 
 
